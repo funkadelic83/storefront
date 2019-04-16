@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("Connected as ID " + connection.threadID + ".\n");
+    // console.log("Connected as ID " + connection.threadID + ".\n");
     takeAction();
 })
 
@@ -22,15 +22,16 @@ function takeAction() {
                 name: "action",
                 type: "rawlist",
                 choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"],
-                message: "What would you like to do?"
+                message: "What would you like to do?\n"
             }
         ])
         .then(function (answer) {
             // console.log("Works so far!");
             if (answer.action === "View Products for Sale") {
-                console.log("Choice 1 has been chosen");
+                // console.log("Choice 1 has been chosen\n");
                 connection.query("SELECT * FROM products", function (err, res) {
                     if (err) throw err;
+                    console.log("\n");
                     for (var i = 0; i < res.length; i++) {
                         console.log(res[i].item_id + ": " + res[i].product_name + " costs $" + res[i].price + ". Quantity: " + res[i].stock_quantity);
                     }
@@ -54,14 +55,6 @@ function takeAction() {
             } else if (answer.action === "Add to Inventory") {
                 console.log("Adding to inventory: \n");
 
-                ///THIS IS WHERE I HAVE A MISSING OR EXTRA CLOSING TAG
-
-
-
-
-
-
-
                 connection.query("SELECT * FROM products", function (err, res) {
                     if (err) throw err;
 
@@ -77,12 +70,12 @@ function takeAction() {
                                     }
                                     return addArray;
                                 },
-                                message: "What item would you like to add inventory for?"
+                                message: "What item would you like to add inventory for?\n"
                             },
                             {
                                 name: "quantity",
                                 type: "input",
-                                message: "How many would you like to add?"
+                                message: "How many would you like to add?\n"
                             }
                         ])
                         .then(function (answer) {
@@ -122,28 +115,28 @@ function takeAction() {
 
 
 } else if (answer.action === "Add New Product") {
-                console.log("Gonna add a new product!");
+                console.log("Add a new product:\n");
                 inquirer
                     .prompt([
                         {
                             name: "newitem",
                             type: "input",
-                            message: "What item would you like to add to the store?"
+                            message: "What item would you like to add to the store?\n"
                         },
                         {
                             name: "department",
                             type: "input",
-                            message: "What department does it belong in?",
+                            message: "What department does it belong in?\n",
                         },
                         {
                             name: "newitemPrice",
                             type: "input",
-                            message: "What is the price?",
+                            message: "What is the price?\n",
                         },
                         {
                             name: "newitemQuantity",
                             type: "input",
-                            message: "How many are available for sale?"
+                            message: "How many are available for sale?\n"
                         }
                     ]).then(function (answer) {
                         console.log("Adding item to inventory...\n");

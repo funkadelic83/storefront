@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("Connected as ID " + connection.threadID + ".\n");
+    // console.log("Connected as ID " + connection.threadID + ".\n");
     displayInventory();
 })
 
@@ -20,9 +20,9 @@ function displayInventory() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id + ": " + res[i].product_name + " costs $" + res[i].price);
+            console.log(res[i].item_id + ": " + res[i].product_name + " costs $" + res[i].price + ". Quantity in stock: " + res[i].stock_quantity);
         }
-        // connection.end();
+        console.log("\n");
         buySomething();
     })
 };
@@ -42,27 +42,24 @@ function buySomething() {
                         }
                         return choiceArray;
                     },
-                    message: "What item would you like to buy?"
+                    message: "What item would you like to buy?\n"
                 },
                 {
                     name: "quantity",
                     type: "input",
-                    message: "How many would you like to buy?"
+                    message: "How many would you like to buy?\n"
                 }
             ])
             .then(function (answer) {
-                // console.log("Works so far!");
                 var chosenItem;
                 for (var i = 0; i < res.length; i++) {
                     if (res[i].product_name === answer.choice) {
                         chosenItem = res[i];
                     }
                 }
-                // console.log(chosenItem);
-                if (chosenItem.stock_quantity > parseInt(answer.quantity)) {
-                    console.log("They have enough!");
+                if (chosenItem.stock_quantity >= parseInt(answer.quantity)) {
+                    console.log("They have enough. Sold!\n");
                     var newQuantity = (chosenItem.stock_quantity - parseInt(answer.quantity));
-                    // console.log("They now have " + newQuantity + " in stock.");
                     connection.query(
                         "UPDATE products SET ? WHERE ?",
                         [
@@ -77,19 +74,15 @@ function buySomething() {
                             if (error) throw err;
                             console.log("Store inventory updated!\n");
                             var totalCost = (chosenItem.price * answer.quantity);
-                            console.log("The total cost of your purchase is: " + totalCost);
-                            process.exit();
+                            console.log("The total cost of your purchase is: " + totalCost + ".\n");
+                            // process.exit()
+                            buySomething();
                         }
                     );
-
-
                 } else {
-                    console.log("They don't have enough. They only have " + chosenItem.stock_quantity + ".");
-                    process.exit();
+                    console.log("They don't have enough. They have " + chosenItem.stock_quantity + " in stock.\n");
+                    buySomething();
                 }
             });
-
     })
-
 };
-
